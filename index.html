@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>六级练习台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #657181;
+      --line: #d9e0e8;
+      --panel: #ffffff;
+      --paper: #eef4f7;
+      --accent: #176b87;
+      --accent-strong: #0f5268;
+      --accent-soft: #dff3f2;
+      --rose: #e96f66;
+      --honey: #f4bd50;
+      --good: #157347;
+      --bad: #b42318;
+      --warn: #9a5b00;
+      --shadow: 0 18px 42px rgba(24, 48, 62, 0.12);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(223, 243, 242, 0.85), rgba(255, 246, 226, 0.75) 42%, rgba(238, 244, 247, 1) 74%),
+        var(--paper);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px clamp(16px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      color: var(--accent-strong);
+      font-size: 14px;
+      white-space: nowrap;
+      background: var(--accent-soft);
+      border: 1px solid #c5e7e4;
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .file-button,
+    .ghost,
+    .primary {
+      min-height: 38px;
+      border-radius: 8px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), #2a8c7c);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 8px 18px rgba(23, 107, 135, 0.22);
+    }
+
+    .primary:hover {
+      background: var(--accent-strong);
+    }
+
+    .ghost:hover,
+    .file-button:hover {
+      border-color: #aeb9c6;
+      background: #f7f9fb;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .layout {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 24px clamp(14px, 3vw, 32px) 36px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .side {
+      padding: 18px;
+      position: sticky;
+      top: 82px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: #314150;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 76px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #fbfcfe;
+    }
+
+    .stat strong {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    select {
+      width: 100%;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 0 10px;
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    .mini-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .quiz {
+      padding: clamp(18px, 4vw, 34px);
+      min-height: 590px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--honey), var(--rose));
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #f7fbfc;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: #40515f;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .source {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .question {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .stem {
+      font-size: clamp(20px, 2vw, 26px);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .passage {
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      background: #f5fbfa;
+      color: #2b3a44;
+      line-height: 1.7;
+      border-radius: 0 8px 8px 0;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      width: 100%;
+      min-height: 54px;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      align-items: center;
+      color: var(--ink);
+    }
+
+    .option:hover {
+      border-color: #88b7b4;
+      background: #f4fbfa;
+    }
+
+    .option.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 107, 135, 0.12);
+    }
+
+    .option.correct {
+      border-color: rgba(21, 115, 71, 0.55);
+      background: #f0faf4;
+    }
+
+    .option.wrong {
+      border-color: rgba(180, 35, 24, 0.55);
+      background: #fff4f2;
+    }
+
+    .key {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid #c5d0db;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #354857;
+      background: #fff8e7;
+      flex: none;
+    }
+
+    .blank-wrap {
+      display: grid;
+      gap: 10px;
+      max-width: 620px;
+    }
+
+    .translation-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
+    .blank-wrap input,
+    .translation-wrap textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    .blank-wrap input {
+      min-height: 48px;
+      padding: 0 13px;
+    }
+
+    .translation-wrap textarea {
+      min-height: 180px;
+      resize: vertical;
+      padding: 13px;
+      line-height: 1.6;
+    }
+
+    .feedback {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fbfcfe;
+      display: none;
+      line-height: 1.65;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.good {
+      border-color: rgba(21, 115, 71, 0.45);
+      background: #f1fbf5;
+    }
+
+    .feedback.bad {
+      border-color: rgba(180, 35, 24, 0.42);
+      background: #fff7f5;
+    }
+
+    .feedback h2 {
+      margin: 0 0 7px;
+      font-size: 17px;
+    }
+
+    .feedback p {
+      margin: 7px 0 0;
+    }
+
+    .answer-line {
+      color: #253442;
+      font-weight: 700;
+    }
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .wrong-list {
+      margin-top: 18px;
+      max-height: 280px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .wrong-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+      display: grid;
+      gap: 6px;
+    }
+
+    .wrong-item button {
+      justify-self: start;
+      min-height: 32px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--accent-strong);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 8px 0;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: #17212b;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 5;
+      max-width: calc(100vw - 30px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -4px);
+    }
+
+    .pet-pop {
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      background: rgba(238, 244, 247, 0.62);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+    }
+
+    .pet-pop.show {
+      animation: petJump 3.1s ease both;
+    }
+
+    .pet-bubble {
+      max-width: min(560px, calc(100vw - 38px));
+      background: #ffffff;
+      border: 3px solid #17212b;
+      border-radius: 8px;
+      padding: 18px 22px;
+      box-shadow: 8px 8px 0 rgba(23, 33, 43, 0.18);
+      font-size: clamp(20px, 4vw, 30px);
+      font-weight: 800;
+      line-height: 1.45;
+      color: #17212b;
+      text-align: center;
+    }
+
+    .pixel-cat {
+      width: 84px;
+      height: 78px;
+      position: relative;
+      image-rendering: pixelated;
+      filter: drop-shadow(5px 6px 0 rgba(23, 33, 43, 0.12));
+      transform: scale(1.85);
+      transform-origin: center;
+    }
+
+    .cat-body,
+    .cat-head,
+    .cat-ear,
+    .cat-tail,
+    .cat-leg,
+    .cat-face,
+    .cat-cheek {
+      position: absolute;
+      background: #ffd36a;
+      border: 3px solid #17212b;
+      border-radius: 2px;
+    }
+
+    .cat-body {
+      width: 46px;
+      height: 34px;
+      left: 21px;
+      bottom: 7px;
+      background: #ffcf66;
+    }
+
+    .cat-head {
+      width: 48px;
+      height: 42px;
+      left: 12px;
+      bottom: 32px;
+      background: #ffd979;
+    }
+
+    .cat-ear {
+      width: 17px;
+      height: 17px;
+      bottom: 64px;
+      background: #ffd979;
+      transform: rotate(45deg);
+    }
+
+    .cat-ear.left {
+      left: 15px;
+    }
+
+    .cat-ear.right {
+      left: 44px;
+    }
+
+    .cat-tail {
+      width: 28px;
+      height: 15px;
+      right: 0;
+      bottom: 24px;
+      border-left: 0;
+      background: #ffbd55;
+      transform-origin: left center;
+    }
+
+    .cat-leg {
+      width: 12px;
+      height: 12px;
+      bottom: 0;
+      background: #ffc45d;
+    }
+
+    .cat-leg.one {
+      left: 27px;
+    }
+
+    .cat-leg.two {
+      left: 51px;
+    }
+
+    .cat-face {
+      width: 5px;
+      height: 5px;
+      border: 0;
+      background: #17212b;
+      bottom: 51px;
+    }
+
+    .cat-face.eye-left {
+      left: 25px;
+    }
+
+    .cat-face.eye-right {
+      left: 45px;
+    }
+
+    .cat-face.mouth {
+      width: 10px;
+      height: 4px;
+      left: 32px;
+      bottom: 42px;
+      background: #17212b;
+    }
+
+    .cat-cheek {
+      width: 7px;
+      height: 5px;
+      border: 0;
+      background: #ff8f86;
+      bottom: 45px;
+    }
+
+    .cat-cheek.left {
+      left: 18px;
+    }
+
+    .cat-cheek.right {
+      left: 51px;
+    }
+
+    .pet-pop.good .cat-tail {
+      animation: tailWag 0.22s steps(2) infinite;
+    }
+
+    .pet-pop.good .pixel-cat {
+      animation: catCelebrate 0.58s steps(3) infinite;
+    }
+
+    .pet-pop.bad .cat-head {
+      animation: tinyNod 0.58s steps(2) infinite;
+    }
+
+    @keyframes petJump {
+      0% {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      12% {
+        opacity: 1;
+        transform: scale(1.03);
+      }
+      22% {
+        transform: scale(1);
+      }
+      82% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+    }
+
+    @keyframes tailWag {
+      from {
+        transform: rotate(-9deg);
+      }
+      to {
+        transform: rotate(9deg);
+      }
+    }
+
+    @keyframes tinyNod {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(3px);
+      }
+    }
+
+    @keyframes catCelebrate {
+      0% {
+        transform: scale(1.85) translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: scale(1.85) translateY(-9px) rotate(-2deg);
+      }
+      100% {
+        transform: scale(1.85) translateY(0) rotate(2deg);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .topbar,
+      .brand {
+        align-items: flex-start;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
+
+      .quiz {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .brand {
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .top-actions,
+      .footer-actions,
+      .mini-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+      }
+
+      .file-button,
+      .ghost,
+      .primary {
+        width: 100%;
+      }
+
+      .option {
+        grid-template-columns: 28px 1fr;
+        padding: 11px;
+      }
+
+      .pet-pop {
+        gap: 18px;
+      }
+
+      .pixel-cat {
+        transform: scale(1.45);
+      }
+
+      .pet-bubble {
+        max-width: calc(100vw - 28px);
+        padding: 15px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>六级练习台</h1>
+        <span id="bankName">原创示例题库</span>
+      </div>
+      <div class="top-actions">
+        <label class="file-button" for="importFile">导入题库</label>
+        <input id="importFile" type="file" accept="application/json,.json">
+        <button class="ghost" id="exportWrongs" type="button">导出错题</button>
+        <button class="ghost" id="resetProgress" type="button">清空记录</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel side">
+        <h2 class="section-title">今日状态</h2>
+        <div class="stats">
+          <div class="stat">
+            <strong id="answeredCount">0</strong>
+            <span>已答</span>
+          </div>
+          <div class="stat">
+            <strong id="accuracyRate">0%</strong>
+            <span>正确率</span>
+          </div>
+          <div class="stat">
+            <strong id="streakCount">0</strong>
+            <span>连对</span>
+          </div>
+          <div class="stat">
+            <strong id="wrongCount">0</strong>
+            <span>错题</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="field">
+            <label for="sectionFilter">考点</label>
+            <select id="sectionFilter">
+              <option value="all">全部考点</option>
+              <option value="cloze">选词填空</option>
+              <option value="reading">阅读理解</option>
+              <option value="translation">汉翻英</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="typeFilter">题型</label>
+            <select id="typeFilter">
+              <option value="all">全部题型</option>
+              <option value="choice">选择题</option>
+              <option value="blank">填空题</option>
+              <option value="translation">汉翻英</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mini-actions">
+          <button class="ghost" id="wrongMode" type="button">练错题</button>
+          <button class="ghost" id="normalMode" type="button">随机练习</button>
+        </div>
+
+        <div class="wrong-list" id="wrongList"></div>
+      </aside>
+
+      <section class="panel quiz">
+        <div class="meta">
+          <div class="pill-row">
+            <span class="pill" id="sectionLabel">词汇辨析</span>
+            <span class="pill" id="typeLabel">选择题</span>
+            <span class="pill" id="levelLabel">CET-6</span>
+          </div>
+          <span class="source" id="sourceLabel">原创示例</span>
+        </div>
+
+        <div class="question">
+          <div class="passage" id="passageBox" hidden></div>
+          <p class="stem" id="stemText"></p>
+          <div class="options" id="optionsBox"></div>
+          <div class="blank-wrap" id="blankBox" hidden>
+            <input id="blankInput" type="text" autocomplete="off" placeholder="输入答案">
+          </div>
+          <div class="translation-wrap" id="translationBox" hidden>
+            <textarea id="translationInput" autocomplete="off" placeholder="输入英文译文"></textarea>
+          </div>
+          <div class="feedback" id="feedbackBox"></div>
+        </div>
+
+        <div class="footer-actions">
+          <span class="status" id="statusText">选择答案后提交</span>
+          <div class="top-actions">
+            <button class="primary" id="submitAnswer" type="button">提交</button>
+            <button class="ghost" id="nextQuestion" type="button">下一题</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="pet-pop" id="petPop" role="status" aria-live="polite" aria-hidden="true">
+    <div class="pet-bubble" id="petBubble">好耶！</div>
+    <div class="pixel-cat" aria-hidden="true">
+      <div class="cat-tail"></div>
+      <div class="cat-body"></div>
+      <div class="cat-leg one"></div>
+      <div class="cat-leg two"></div>
+      <div class="cat-ear left"></div>
+      <div class="cat-ear right"></div>
+      <div class="cat-head"></div>
+      <div class="cat-face eye-left"></div>
+      <div class="cat-face eye-right"></div>
+      <div class="cat-face mouth"></div>
+      <div class="cat-cheek left"></div>
+      <div class="cat-cheek right"></div>
+    </div>
+  </div>
+
+  <script>
+    const defaultBank = {
+      name: "原创示例题库",
+      questions: [
+        {
+          id: "sample-vocab-001",
+          type: "choice",
+          section: "vocabulary",
+          source: "原创示例",
+          stem: "The committee decided to _____ the proposal until more reliable data became available.",
+          options: [
+            { key: "A", text: "defer" },
+            { key: "B", text: "derive" },
+            { key: "C", text: "detect" },
+            { key: "D", text: "detach" }
+          ],
+          answer: "A",
+          explanation: "defer 表示“推迟、延期”。句子说委员会要等到有更可靠的数据后再处理提案，所以应选择 defer。derive 是“源自”，detect 是“发现”，detach 是“分离”。"
+        },
+        {
+          id: "sample-vocab-002",
+          type: "choice",
+          section: "vocabulary",
+          source: "原创示例",
+          stem: "A good summary should be concise but not so brief that it becomes _____.",
+          options: [
+            { key: "A", text: "ambiguous" },
+            { key: "B", text: "abundant" },
+            { key: "C", text: "authentic" },
+            { key: "D", text: "automatic" }
+          ],
+          answer: "A",
+          explanation: "ambiguous 表示“含糊的、有歧义的”。摘要可以简洁，但不能简洁到让意思变得不清楚。"
+        },
+        {
+          id: "sample-grammar-001",
+          type: "choice",
+          section: "grammar",
+          source: "原创示例",
+          stem: "Had the manager listened to the engineers earlier, the problem _____ before the launch.",
+          options: [
+            { key: "A", text: "would have been fixed" },
+            { key: "B", text: "will be fixed" },
+            { key: "C", text: "has been fixed" },
+            { key: "D", text: "was fixing" }
+          ],
+          answer: "A",
+          explanation: "Had + 主语 + 过去分词 是省略 if 的过去虚拟条件句，主句应用 would have done，表示“本来会发生但实际没有发生”。"
+        },
+        {
+          id: "sample-reading-001",
+          type: "choice",
+          section: "reading",
+          source: "原创示例",
+          passage: "Researchers have found that students who review material in several short sessions tend to remember it longer than those who study in one long session. The effect is strongest when the sessions are separated by enough time for partial forgetting to occur.",
+          stem: "What does the passage mainly suggest about learning?",
+          options: [
+            { key: "A", text: "Short repeated reviews can improve long-term memory." },
+            { key: "B", text: "Long sessions are always more efficient." },
+            { key: "C", text: "Forgetting should be avoided completely." },
+            { key: "D", text: "Reviewing has little effect on exam performance." }
+          ],
+          answer: "A",
+          explanation: "短文核心是分散复习比一次性长时间学习更利于长期记忆，所以主旨选 A。文中没有说长时间学习总是高效，也没有说完全避免遗忘。"
+        },
+        {
+          id: "sample-blank-001",
+          type: "blank",
+          section: "vocabulary",
+          source: "原创示例",
+          stem: "The city plans to invest in renewable energy to make public transport more _____.",
+          answer: ["sustainable"],
+          explanation: "sustainable 表示“可持续的”。renewable energy 与 public transport 的语境指向环保和长期可持续。"
+        },
+        {
+          id: "sample-blank-002",
+          type: "blank",
+          section: "grammar",
+          source: "原创示例",
+          stem: "No sooner had she entered the classroom _____ the bell rang.",
+          answer: ["than"],
+          explanation: "No sooner ... than ... 是固定结构，表示“刚……就……”。"
+        },
+        {
+          id: "sample-cloze-001",
+          type: "blank",
+          section: "cloze",
+          source: "原创示例",
+          passage: "Academic writing often requires writers to present claims carefully. Instead of making absolute statements, they use expressions that show probability and limitation.",
+          stem: "In this context, words such as 'probably' and 'possibly' are used to make claims more _____.",
+          answer: ["cautious", "qualified"],
+          explanation: "probably 和 possibly 会弱化绝对判断，让表达更谨慎。cautious 或 qualified 都符合语境。"
+        },
+        {
+          id: "sample-reading-002",
+          type: "choice",
+          section: "reading",
+          source: "原创示例",
+          passage: "Many companies collect customer feedback, but the value of that feedback depends on whether managers are willing to change existing routines. Data alone rarely improves service unless it leads to action.",
+          stem: "According to the passage, customer feedback is useful only when companies _____.",
+          options: [
+            { key: "A", text: "turn it into practical changes" },
+            { key: "B", text: "collect as much of it as possible" },
+            { key: "C", text: "keep their routines unchanged" },
+            { key: "D", text: "avoid asking managers to respond" }
+          ],
+          answer: "A",
+          explanation: "关键句是 Data alone rarely improves service unless it leads to action，说明反馈必须转化为行动和改变。"
+        },
+        {
+          id: "sample-translation-001",
+          type: "translation",
+          section: "translation",
+          source: "原创示例",
+          stem: "近年来，越来越多的中国城市开始重视公共交通的发展。便利、绿色的公共交通不仅能减少交通拥堵，也能改善城市居民的生活质量。",
+          answer: "In recent years, more and more Chinese cities have begun to attach importance to the development of public transportation. Convenient and green public transportation can not only reduce traffic congestion, but also improve the quality of life for urban residents.",
+          explanation: "提交后对照参考译文，重点看信息是否完整、表达是否自然、关键词是否准确。"
+        }
+      ]
+    };
+
+    const labels = {
+      vocabulary: "词汇辨析",
+      reading: "阅读理解",
+      grammar: "语法结构",
+      cloze: "选词填空",
+      translation: "汉翻英",
+      choice: "选择题",
+      blank: "填空题"
+    };
+
+    const storageKeys = {
+      bank: "cet6-trainer-bank",
+      progress: "cet6-trainer-progress"
+    };
+
+    const allowedSections = new Set(["cloze", "reading", "translation"]);
+
+    let bank = loadBank();
+    let progress = loadProgress();
+    let currentQuestion = null;
+    let selectedAnswer = "";
+    let checked = false;
+    let wrongOnly = false;
+
+    const els = {
+      bankName: document.getElementById("bankName"),
+      answeredCount: document.getElementById("answeredCount"),
+      accuracyRate: document.getElementById("accuracyRate"),
+      streakCount: document.getElementById("streakCount"),
+      wrongCount: document.getElementById("wrongCount"),
+      sectionFilter: document.getElementById("sectionFilter"),
+      typeFilter: document.getElementById("typeFilter"),
+      wrongList: document.getElementById("wrongList"),
+      sectionLabel: document.getElementById("sectionLabel"),
+      typeLabel: document.getElementById("typeLabel"),
+      levelLabel: document.getElementById("levelLabel"),
+      sourceLabel: document.getElementById("sourceLabel"),
+      passageBox: document.getElementById("passageBox"),
+      stemText: document.getElementById("stemText"),
+      optionsBox: document.getElementById("optionsBox"),
+      blankBox: document.getElementById("blankBox"),
+      blankInput: document.getElementById("blankInput"),
+      translationBox: document.getElementById("translationBox"),
+      translationInput: document.getElementById("translationInput"),
+      feedbackBox: document.getElementById("feedbackBox"),
+      statusText: document.getElementById("statusText"),
+      submitAnswer: document.getElementById("submitAnswer"),
+      nextQuestion: document.getElementById("nextQuestion"),
+      importFile: document.getElementById("importFile"),
+      exportWrongs: document.getElementById("exportWrongs"),
+      resetProgress: document.getElementById("resetProgress"),
+      wrongMode: document.getElementById("wrongMode"),
+      normalMode: document.getElementById("normalMode"),
+      toast: document.getElementById("toast"),
+      petPop: document.getElementById("petPop"),
+      petBubble: document.getElementById("petBubble")
+    };
+
+    function loadBank() {
+      try {
+        const saved = localStorage.getItem(storageKeys.bank);
+        if (!saved) return defaultBank;
+        const parsed = JSON.parse(saved);
+        return validateBank(parsed) ? parsed : defaultBank;
+      } catch {
+        return defaultBank;
+      }
+    }
+
+    function loadProgress() {
+      try {
+        const saved = localStorage.getItem(storageKeys.progress);
+        if (!saved) return emptyProgress();
+        return { ...emptyProgress(), ...JSON.parse(saved) };
+      } catch {
+        return emptyProgress();
+      }
+    }
+
+    function emptyProgress() {
+      return {
+        answered: 0,
+        graded: 0,
+        correct: 0,
+        streak: 0,
+        wrongs: {},
+        recentIds: []
+      };
+    }
+
+    function saveProgress() {
+      localStorage.setItem(storageKeys.progress, JSON.stringify(progress));
+    }
+
+    function saveBank() {
+      localStorage.setItem(storageKeys.bank, JSON.stringify(bank));
+    }
+
+    function validateBank(data) {
+      const questions = Array.isArray(data) ? data : data && data.questions;
+      if (!Array.isArray(questions) || questions.length === 0) return false;
+      return questions.every((q) => {
+        const hasBase = q && q.id && q.type && q.section && q.stem && q.answer !== undefined;
+        const choiceOk = q.type !== "choice" || (Array.isArray(q.options) && q.options.length >= 2);
+        const blankOk = q.type !== "blank" || (typeof q.answer === "string" || Array.isArray(q.answer));
+        const translationOk = q.type !== "translation" || typeof q.answer === "string";
+        return hasBase && choiceOk && blankOk && translationOk;
+      });
+    }
+
+    function normalizeImportedBank(data) {
+      const questions = Array.isArray(data) ? data : data.questions;
+      return {
+        name: data.name || "导入题库",
+        questions: questions.map((q, index) => ({
+          source: "导入题库",
+          explanation: "这道题还没有填写解析。建议在题库 JSON 里补上 explanation 字段。",
+          ...q,
+          id: q.id || `imported-${Date.now()}-${index}`
+        }))
+      };
+    }
+
+    function filteredQuestions() {
+      const section = els.sectionFilter.value;
+      const type = els.typeFilter.value;
+      let list = bank.questions.filter((q) => {
+        if (!allowedSections.has(q.section)) return false;
+        const sectionOk = section === "all" || q.section === section;
+        const typeOk = type === "all" || q.type === type;
+        return sectionOk && typeOk;
+      });
+
+      if (wrongOnly) {
+        const wrongIds = new Set(Object.keys(progress.wrongs));
+        list = list.filter((q) => wrongIds.has(q.id));
+      }
+
+      return list;
+    }
+
+    function pickQuestion(preferredId) {
+      const list = filteredQuestions();
+      if (list.length === 0) {
+        renderEmptyQuestion();
+        return;
+      }
+
+      if (preferredId) {
+        const found = list.find((q) => q.id === preferredId);
+        if (found) {
+          renderQuestion(found);
+          return;
+        }
+      }
+
+      const fresh = list.filter((q) => !progress.recentIds.includes(q.id));
+      const pool = fresh.length ? fresh : list;
+      const next = pool[Math.floor(Math.random() * pool.length)];
+      renderQuestion(next);
+    }
+
+    function renderQuestion(question) {
+      currentQuestion = question;
+      selectedAnswer = "";
+      checked = false;
+
+      els.bankName.textContent = `${bank.name || "题库"} · ${bank.questions.length} 题`;
+      els.sectionLabel.textContent = labels[question.section] || question.section;
+      els.typeLabel.textContent = labels[question.type] || question.type;
+      els.levelLabel.textContent = "CET-6";
+      els.sourceLabel.textContent = question.source || "题库";
+      els.stemText.textContent = question.stem;
+      els.feedbackBox.className = "feedback";
+      els.feedbackBox.innerHTML = "";
+      els.statusText.textContent = question.type === "choice" ? "选择答案后提交" : "输入答案后提交";
+
+      if (question.passage) {
+        els.passageBox.hidden = false;
+        els.passageBox.textContent = question.passage;
+      } else {
+        els.passageBox.hidden = true;
+        els.passageBox.textContent = "";
+      }
+
+      if (question.type === "choice") {
+        els.blankBox.hidden = true;
+        els.translationBox.hidden = true;
+        els.optionsBox.hidden = false;
+        els.optionsBox.innerHTML = "";
+        question.options.forEach((option) => {
+          const button = document.createElement("button");
+          button.className = "option";
+          button.type = "button";
+          button.dataset.key = option.key;
+          button.innerHTML = `<span class="key">${escapeHtml(option.key)}</span><span>${escapeHtml(option.text)}</span>`;
+          button.addEventListener("click", () => selectOption(option.key));
+          els.optionsBox.appendChild(button);
+        });
+      } else if (question.type === "blank") {
+        els.optionsBox.hidden = true;
+        els.optionsBox.innerHTML = "";
+        els.translationBox.hidden = true;
+        els.blankBox.hidden = false;
+        els.blankInput.value = "";
+        window.setTimeout(() => els.blankInput.focus(), 0);
+      } else {
+        els.optionsBox.hidden = true;
+        els.optionsBox.innerHTML = "";
+        els.blankBox.hidden = true;
+        els.translationBox.hidden = false;
+        els.translationInput.value = "";
+        els.statusText.textContent = "输入译文后提交";
+        window.setTimeout(() => els.translationInput.focus(), 0);
+      }
+
+      updateStats();
+    }
+
+    function renderEmptyQuestion() {
+      currentQuestion = null;
+      els.sectionLabel.textContent = "无题目";
+      els.typeLabel.textContent = "筛选为空";
+      els.sourceLabel.textContent = "调整筛选";
+      els.passageBox.hidden = true;
+      els.stemText.textContent = wrongOnly ? "当前筛选下没有错题。" : "当前筛选下没有题目。";
+      els.optionsBox.innerHTML = "";
+      els.blankBox.hidden = true;
+      els.translationBox.hidden = true;
+      els.feedbackBox.className = "feedback";
+      els.feedbackBox.innerHTML = "";
+      els.statusText.textContent = "换一个筛选条件试试";
+      updateStats();
+    }
+
+    function selectOption(key) {
+      if (checked) return;
+      selectedAnswer = key;
+      [...els.optionsBox.querySelectorAll(".option")].forEach((button) => {
+        button.classList.toggle("selected", button.dataset.key === key);
+      });
+    }
+
+    function checkAnswer() {
+      if (!currentQuestion || checked) return;
+
+      const answer = getCurrentAnswer();
+      if (!String(answer || "").trim()) {
+        showToast("先填一个答案");
+        return;
+      }
+
+      if (currentQuestion.type === "translation") {
+        checked = true;
+        progress.answered += 1;
+        progress.streak = 0;
+        progress.recentIds = [currentQuestion.id, ...progress.recentIds.filter((id) => id !== currentQuestion.id)].slice(0, 8);
+        saveProgress();
+        renderFeedback(true, answer);
+        showPet("translation");
+        updateStats();
+        renderWrongList();
+        return;
+      }
+
+      const isCorrect = isAnswerCorrect(currentQuestion, answer);
+      checked = true;
+      progress.answered += 1;
+      progress.graded = (progress.graded || 0) + 1;
+      progress.correct += isCorrect ? 1 : 0;
+      progress.streak = isCorrect ? progress.streak + 1 : 0;
+      progress.recentIds = [currentQuestion.id, ...progress.recentIds.filter((id) => id !== currentQuestion.id)].slice(0, 8);
+
+      if (isCorrect) {
+        delete progress.wrongs[currentQuestion.id];
+      } else {
+        progress.wrongs[currentQuestion.id] = {
+          id: currentQuestion.id,
+          response: String(answer).trim(),
+          time: new Date().toISOString()
+        };
+      }
+
+      saveProgress();
+      markOptions(answer);
+      renderFeedback(isCorrect, answer);
+      showPet(isCorrect ? "good" : "bad");
+      updateStats();
+      renderWrongList();
+    }
+
+    function getCurrentAnswer() {
+      if (!currentQuestion) return "";
+      if (currentQuestion.type === "choice") return selectedAnswer;
+      if (currentQuestion.type === "translation") return els.translationInput.value;
+      return els.blankInput.value;
+    }
+
+    function isAnswerCorrect(question, answer) {
+      if (question.type === "choice") {
+        return normalize(answer) === normalize(question.answer);
+      }
+      const accepted = Array.isArray(question.answer) ? question.answer : [question.answer];
+      return accepted.some((item) => normalize(item) === normalize(answer));
+    }
+
+    function normalize(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[.,;:!?'"`，。；：！？“”‘’]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function markOptions(answer) {
+      if (currentQuestion.type !== "choice") return;
+      [...els.optionsBox.querySelectorAll(".option")].forEach((button) => {
+        const key = button.dataset.key;
+        if (normalize(key) === normalize(currentQuestion.answer)) button.classList.add("correct");
+        if (normalize(key) === normalize(answer) && normalize(answer) !== normalize(currentQuestion.answer)) {
+          button.classList.add("wrong");
+        }
+      });
+    }
+
+    function renderFeedback(isCorrect, answer) {
+      const accepted = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.join(" / ") : currentQuestion.answer;
+      const isTranslation = currentQuestion.type === "translation";
+      const title = isTranslation ? "参考译文" : (isCorrect ? "答对了" : "这题要修正一下");
+      const answerLine = currentQuestion.type === "choice"
+        ? `正确答案：${accepted}`
+        : `参考答案：${accepted}`;
+
+      els.feedbackBox.className = `feedback show ${isCorrect ? "good" : "bad"}`;
+      els.feedbackBox.innerHTML = `
+        <h2>${title}</h2>
+        <p class="answer-line">${escapeHtml(answerLine)}</p>
+        ${isCorrect && !isTranslation ? "" : `<p>你的答案：${escapeHtml(String(answer).trim())}</p>`}
+        <p>${escapeHtml(currentQuestion.explanation || "这道题还没有解析。")}</p>
+      `;
+      els.statusText.textContent = isTranslation ? "已完成，对照参考译文修改" : (isCorrect ? "不错，继续保持" : "已加入错题本");
+    }
+
+    function updateStats() {
+      const graded = progress.graded || 0;
+      const accuracy = graded ? Math.round((progress.correct / graded) * 100) : 0;
+      els.answeredCount.textContent = progress.answered;
+      els.accuracyRate.textContent = `${accuracy}%`;
+      els.streakCount.textContent = progress.streak;
+      els.wrongCount.textContent = Object.keys(progress.wrongs).length;
+    }
+
+    function renderWrongList() {
+      const wrongEntries = Object.values(progress.wrongs)
+        .map((wrong) => ({ wrong, question: bank.questions.find((q) => q.id === wrong.id) }))
+        .filter((item) => item.question)
+        .slice(-20)
+        .reverse();
+
+      if (wrongEntries.length === 0) {
+        els.wrongList.innerHTML = '<div class="empty">错题会出现在这里。</div>';
+        return;
+      }
+
+      els.wrongList.innerHTML = "";
+      wrongEntries.forEach(({ wrong, question }) => {
+        const item = document.createElement("div");
+        item.className = "wrong-item";
+        item.innerHTML = `
+          <strong>${escapeHtml(labels[question.section] || question.section)} · ${escapeHtml(labels[question.type] || question.type)}</strong>
+          <span>${escapeHtml(question.stem)}</span>
+          <button type="button">重练</button>
+        `;
+        item.querySelector("button").addEventListener("click", () => {
+          wrongOnly = false;
+          pickQuestion(wrong.id);
+        });
+        els.wrongList.appendChild(item);
+      });
+    }
+
+    function exportWrongs() {
+      const data = Object.values(progress.wrongs).map((wrong) => {
+        const question = bank.questions.find((q) => q.id === wrong.id);
+        return {
+          ...wrong,
+          question
+        };
+      }).filter((item) => item.question);
+
+      if (!data.length) {
+        showToast("现在还没有错题");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `cet6-wrong-questions-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importBank(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!validateBank(data)) {
+            showToast("题库格式不对，看看 sample 文件");
+            return;
+          }
+          bank = normalizeImportedBank(data);
+          progress = emptyProgress();
+          saveBank();
+          saveProgress();
+          wrongOnly = false;
+          renderWrongList();
+          pickQuestion();
+          showToast(`已导入 ${bank.questions.length} 题`);
+        } catch {
+          showToast("JSON 文件读取失败");
+        } finally {
+          els.importFile.value = "";
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    function resetProgress() {
+      progress = emptyProgress();
+      saveProgress();
+      renderWrongList();
+      pickQuestion(currentQuestion && currentQuestion.id);
+      showToast("记录已清空");
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function showPet(mode) {
+      const messages = {
+        good: ["喵！答对啦，六级战斗力 +1！", "漂亮，这题拿下了，继续保持！", "太稳了，今天的手感正在变好。"],
+        bad: ["没关系，错题是升级材料，猫猫陪你补上。", "这题先收进经验值，下一题我们拿回来。", "别慌，知道错在哪就已经赢一半了。"],
+        translation: ["译完啦，对照参考译文，把句子再磨顺一点。", "汉翻英完成，看看关键词有没有落下。", "很好，翻译就是一次次改到更自然。"]
+      };
+      const pool = messages[mode] || messages.good;
+      els.petBubble.textContent = pool[Math.floor(Math.random() * pool.length)];
+      els.petPop.classList.remove("show", "good", "bad", "translation");
+      void els.petPop.offsetWidth;
+      els.petPop.classList.add("show", mode);
+      els.petPop.setAttribute("aria-hidden", "false");
+      window.clearTimeout(showPet.timer);
+      showPet.timer = window.setTimeout(() => {
+        els.petPop.classList.remove("show");
+        els.petPop.setAttribute("aria-hidden", "true");
+      }, 3200);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    els.submitAnswer.addEventListener("click", checkAnswer);
+    els.nextQuestion.addEventListener("click", () => pickQuestion());
+    els.exportWrongs.addEventListener("click", exportWrongs);
+    els.resetProgress.addEventListener("click", resetProgress);
+    els.importFile.addEventListener("change", importBank);
+    els.sectionFilter.addEventListener("change", () => pickQuestion());
+    els.typeFilter.addEventListener("change", () => pickQuestion());
+    els.blankInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") checkAnswer();
+    });
+    els.wrongMode.addEventListener("click", () => {
+      wrongOnly = true;
+      pickQuestion();
+      showToast("切到错题练习");
+    });
+    els.normalMode.addEventListener("click", () => {
+      wrongOnly = false;
+      pickQuestion();
+      showToast("切到随机练习");
+    });
+
+    renderWrongList();
+    pickQuestion();
+  </script>
+</body>
+</html>

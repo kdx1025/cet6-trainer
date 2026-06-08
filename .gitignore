@@ -1,0 +1,12 @@
+tmp/
+cet6_2019_2025_practice.json
+cet6_import_report.json
+*.log
+*.err
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+__pycache__/
+*.pyc

@@ -1,0 +1,46 @@
+{
+  "name": "六级题库示例",
+  "questions": [
+    {
+      "id": "2026-demo-cloze-001",
+      "type": "choice",
+      "section": "cloze",
+      "source": "原创示例",
+      "passage": "Many cities are trying to make public transport cleaner and more efficient. Investing in renewable energy is one way to make buses and subway systems more environmentally friendly.",
+      "stem": "选词填空：第 26 空应选择哪个单词？The city plans to invest in renewable energy to make public transport more _____.",
+      "options": [
+        { "key": "A", "text": "sustainable" },
+        { "key": "B", "text": "temporary" },
+        { "key": "C", "text": "ambiguous" },
+        { "key": "D", "text": "automatic" }
+      ],
+      "answer": "A",
+      "explanation": "sustainable 表示“可持续的”。renewable energy 与 cleaner public transport 的语境都指向环保和长期可持续。"
+    },
+    {
+      "id": "2026-demo-reading-001",
+      "type": "choice",
+      "section": "reading",
+      "source": "原创示例",
+      "passage": "Many companies collect customer feedback, but the value of that feedback depends on whether managers are willing to change existing routines. Data alone rarely improves service unless it leads to action.",
+      "stem": "According to the passage, customer feedback is useful only when companies _____.",
+      "options": [
+        { "key": "A", "text": "turn it into practical changes" },
+        { "key": "B", "text": "collect as much of it as possible" },
+        { "key": "C", "text": "keep their routines unchanged" },
+        { "key": "D", "text": "avoid asking managers to respond" }
+      ],
+      "answer": "A",
+      "explanation": "关键句是 Data alone rarely improves service unless it leads to action，说明反馈必须转化为行动和改变。"
+    },
+    {
+      "id": "2026-demo-translation-001",
+      "type": "translation",
+      "section": "translation",
+      "source": "原创示例",
+      "stem": "近年来，越来越多的中国城市开始重视公共交通的发展。便利、绿色的公共交通不仅能减少交通拥堵，也能改善城市居民的生活质量。",
+      "answer": "In recent years, more and more Chinese cities have begun to attach importance to the development of public transportation. Convenient and green public transportation can not only reduce traffic congestion, but also improve the quality of life for urban residents.",
+      "explanation": "提交后对照参考译文，重点看信息是否完整、表达是否自然、关键词是否准确。"
+    }
+  ]
+}
