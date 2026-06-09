@@ -441,6 +441,53 @@
       gap: 8px;
     }
 
+    .coach-card {
+      margin-top: 18px;
+      border: 1px solid #cfe0e3;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, #fffdf7, #f7fbfc 76%),
+        #ffffff;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 14px;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .coach-cat-wrap {
+      min-height: 112px;
+      display: grid;
+      place-items: center;
+      background: #eaf6f5;
+      border: 1px solid #c8e4e0;
+      border-radius: 8px;
+    }
+
+    .coach-bubble {
+      min-height: 86px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+      color: #253442;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .coach-bubble strong {
+      color: var(--accent-strong);
+      font-size: 15px;
+    }
+
+    .coach-bubble p {
+      margin: 0;
+    }
+
+    .coach-bubble.bump {
+      animation: bubbleBump 0.46s ease both;
+    }
+
     .wrong-item {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -494,20 +541,39 @@
       position: fixed;
       inset: 0;
       z-index: 6;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(238, 244, 247, 0.58);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pet-scene {
+      width: min(620px, calc(100vw - 32px));
+      min-height: min(460px, calc(100vh - 48px));
+      border: 3px solid #17212b;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, #fffdf5 0 48%, #e8f6f4 48% 100%);
+      box-shadow: 12px 12px 0 rgba(23, 33, 43, 0.16);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 26px;
-      background: rgba(238, 244, 247, 0.62);
-      backdrop-filter: blur(10px);
-      opacity: 0;
-      transform: scale(0.96);
-      pointer-events: none;
+      gap: 28px;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(18px) scale(0.96);
     }
 
     .pet-pop.show {
-      animation: petJump 3.1s ease both;
+      animation: petFade 3.3s ease both;
+    }
+
+    .pet-pop.show .pet-scene {
+      animation: sceneEnter 3.3s ease both;
     }
 
     .pet-bubble {
@@ -522,6 +588,17 @@
       line-height: 1.45;
       color: #17212b;
       text-align: center;
+      z-index: 1;
+    }
+
+    .pet-action-label {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      z-index: 1;
     }
 
     .pixel-cat {
@@ -530,8 +607,19 @@
       position: relative;
       image-rendering: pixelated;
       filter: drop-shadow(5px 6px 0 rgba(23, 33, 43, 0.12));
-      transform: scale(1.85);
+      transform: scale(var(--cat-scale, 1.85));
       transform-origin: center;
+      z-index: 1;
+    }
+
+    .pixel-cat.idle {
+      --cat-scale: 1.08;
+      animation: catIdle 2.8s steps(2) infinite;
+    }
+
+    .pixel-cat.stage {
+      --cat-scale: 2.28;
+      margin-top: 48px;
     }
 
     .cat-body,
@@ -540,7 +628,8 @@
     .cat-tail,
     .cat-leg,
     .cat-face,
-    .cat-cheek {
+    .cat-cheek,
+    .cat-paw {
       position: absolute;
       background: #ffd36a;
       border: 3px solid #17212b;
@@ -587,6 +676,7 @@
       border-left: 0;
       background: #ffbd55;
       transform-origin: left center;
+      animation: tailSway 1.8s steps(2) infinite;
     }
 
     .cat-leg {
@@ -644,6 +734,39 @@
       left: 51px;
     }
 
+    .cat-paw {
+      width: 13px;
+      height: 13px;
+      left: 56px;
+      bottom: 32px;
+      background: #ffc45d;
+      transform-origin: 2px 10px;
+    }
+
+    .pixel-cat.idle .cat-face.eye-left,
+    .pixel-cat.idle .cat-face.eye-right {
+      animation: catBlink 4.6s steps(1) infinite;
+    }
+
+    .pixel-cat.idle .cat-paw {
+      animation: tinyWave 3.4s steps(2) infinite;
+    }
+
+    .pet-pop.good .pet-scene {
+      background:
+        linear-gradient(180deg, #fff9dc 0 48%, #e1f7ec 48% 100%);
+    }
+
+    .pet-pop.bad .pet-scene {
+      background:
+        linear-gradient(180deg, #fff7f4 0 48%, #eef4fb 48% 100%);
+    }
+
+    .pet-pop.translation .pet-scene {
+      background:
+        linear-gradient(180deg, #f7fbff 0 48%, #fff2d8 48% 100%);
+    }
+
     .pet-pop.good .cat-tail {
       animation: tailWag 0.22s steps(2) infinite;
     }
@@ -656,25 +779,112 @@
       animation: tinyNod 0.58s steps(2) infinite;
     }
 
-    @keyframes petJump {
+    .pet-pop.bad .cat-paw {
+      animation: comfortWave 0.7s steps(2) infinite;
+    }
+
+    .pet-pop.translation .pixel-cat {
+      animation: catThink 0.78s steps(2) infinite;
+    }
+
+    .pet-pop.translation .cat-tail {
+      animation: tailSway 0.9s steps(2) infinite;
+    }
+
+    .pet-sparks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .pet-sparks span {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--spark-color, var(--honey));
+      border: 2px solid #17212b;
+      opacity: 0;
+    }
+
+    .pet-sparks span:nth-child(1) {
+      --spark-color: #f4bd50;
+      left: 13%;
+      top: 20%;
+    }
+
+    .pet-sparks span:nth-child(2) {
+      --spark-color: #e96f66;
+      right: 16%;
+      top: 25%;
+      width: 10px;
+      height: 10px;
+    }
+
+    .pet-sparks span:nth-child(3) {
+      --spark-color: #62b48f;
+      left: 24%;
+      bottom: 22%;
+      width: 9px;
+      height: 9px;
+    }
+
+    .pet-sparks span:nth-child(4) {
+      --spark-color: #6aa7c7;
+      right: 24%;
+      bottom: 19%;
+    }
+
+    .pet-pop.good .pet-sparks span {
+      animation: sparkPop 0.82s steps(3) infinite;
+    }
+
+    .pet-pop.good .pet-sparks span:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .pet-pop.good .pet-sparks span:nth-child(3) {
+      animation-delay: 0.22s;
+    }
+
+    .pet-pop.good .pet-sparks span:nth-child(4) {
+      animation-delay: 0.32s;
+    }
+
+    .pet-pop.bad .pet-sparks span {
+      width: 8px;
+      height: 8px;
+      background: #9fd3c7;
+      animation: calmDots 1.08s steps(2) infinite;
+    }
+
+    @keyframes petFade {
       0% {
         opacity: 0;
-        transform: scale(0.92);
       }
       12% {
         opacity: 1;
-        transform: scale(1.03);
-      }
-      22% {
-        transform: scale(1);
       }
       82% {
         opacity: 1;
-        transform: scale(1);
       }
       100% {
         opacity: 0;
-        transform: scale(0.96);
+      }
+    }
+
+    @keyframes sceneEnter {
+      0% {
+        transform: translateY(28px) scale(0.94);
+      }
+      13% {
+        transform: translateY(0) scale(1.02);
+      }
+      24%,
+      82% {
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        transform: translateY(16px) scale(0.98);
       }
     }
 
@@ -684,6 +894,15 @@
       }
       to {
         transform: rotate(9deg);
+      }
+    }
+
+    @keyframes tailSway {
+      from {
+        transform: rotate(-5deg);
+      }
+      to {
+        transform: rotate(5deg);
       }
     }
 
@@ -698,13 +917,107 @@
 
     @keyframes catCelebrate {
       0% {
-        transform: scale(1.85) translateY(0) rotate(0deg);
+        transform: scale(var(--cat-scale, 2.28)) translateY(0) rotate(0deg);
       }
       50% {
-        transform: scale(1.85) translateY(-9px) rotate(-2deg);
+        transform: scale(var(--cat-scale, 2.28)) translateY(-12px) rotate(-2deg);
       }
       100% {
-        transform: scale(1.85) translateY(0) rotate(2deg);
+        transform: scale(var(--cat-scale, 2.28)) translateY(0) rotate(2deg);
+      }
+    }
+
+    @keyframes catIdle {
+      0%,
+      100% {
+        transform: scale(var(--cat-scale, 1.08)) translateY(0);
+      }
+      50% {
+        transform: scale(var(--cat-scale, 1.08)) translateY(-3px);
+      }
+    }
+
+    @keyframes catBlink {
+      0%,
+      88%,
+      100% {
+        height: 5px;
+      }
+      92% {
+        height: 2px;
+      }
+    }
+
+    @keyframes tinyWave {
+      0%,
+      70%,
+      100% {
+        transform: rotate(0deg);
+      }
+      78% {
+        transform: rotate(-28deg);
+      }
+      86% {
+        transform: rotate(12deg);
+      }
+    }
+
+    @keyframes comfortWave {
+      from {
+        transform: rotate(-12deg);
+      }
+      to {
+        transform: rotate(14deg);
+      }
+    }
+
+    @keyframes catThink {
+      0%,
+      100% {
+        transform: scale(var(--cat-scale, 2.28)) translateX(0);
+      }
+      50% {
+        transform: scale(var(--cat-scale, 2.28)) translateX(4px);
+      }
+    }
+
+    @keyframes sparkPop {
+      0% {
+        opacity: 0;
+        transform: translateY(12px) rotate(0deg) scale(0.7);
+      }
+      30%,
+      72% {
+        opacity: 1;
+        transform: translateY(-5px) rotate(18deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-16px) rotate(45deg) scale(0.7);
+      }
+    }
+
+    @keyframes calmDots {
+      0%,
+      100% {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      48% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bubbleBump {
+      0% {
+        transform: translateY(0);
+      }
+      45% {
+        transform: translateY(-4px);
+      }
+      100% {
+        transform: translateY(0);
       }
     }
 
@@ -729,6 +1042,10 @@
 
       .side {
         position: static;
+      }
+
+      .coach-card {
+        grid-template-columns: 96px 1fr;
       }
 
       .quiz {
@@ -763,15 +1080,30 @@
 
       .pet-pop {
         gap: 18px;
+        padding: 14px;
       }
 
-      .pixel-cat {
-        transform: scale(1.45);
+      .pet-scene {
+        min-height: min(430px, calc(100vh - 28px));
+        gap: 22px;
+      }
+
+      .pixel-cat.stage {
+        --cat-scale: 1.78;
+        margin-top: 34px;
       }
 
       .pet-bubble {
         max-width: calc(100vw - 28px);
         padding: 15px 16px;
+      }
+
+      .coach-card {
+        grid-template-columns: 1fr;
+      }
+
+      .coach-cat-wrap {
+        min-height: 104px;
       }
     }
   </style>
@@ -839,6 +1171,30 @@
           <button class="ghost" id="normalMode" type="button">随机练习</button>
         </div>
 
+        <section class="coach-card" aria-live="polite">
+          <div class="coach-cat-wrap">
+            <div class="pixel-cat idle" aria-hidden="true">
+              <div class="cat-tail"></div>
+              <div class="cat-body"></div>
+              <div class="cat-leg one"></div>
+              <div class="cat-leg two"></div>
+              <div class="cat-ear left"></div>
+              <div class="cat-ear right"></div>
+              <div class="cat-head"></div>
+              <div class="cat-paw"></div>
+              <div class="cat-face eye-left"></div>
+              <div class="cat-face eye-right"></div>
+              <div class="cat-face mouth"></div>
+              <div class="cat-cheek left"></div>
+              <div class="cat-cheek right"></div>
+            </div>
+          </div>
+          <div class="coach-bubble" id="coachBubble">
+            <strong>猫猫陪练在线</strong>
+            <p id="coachText">先热身一题，节奏交给你。</p>
+          </div>
+        </section>
+
         <div class="wrong-list" id="wrongList"></div>
       </aside>
 
@@ -878,20 +1234,30 @@
 
   <div class="toast" id="toast"></div>
   <div class="pet-pop" id="petPop" role="status" aria-live="polite" aria-hidden="true">
-    <div class="pet-bubble" id="petBubble">好耶！</div>
-    <div class="pixel-cat" aria-hidden="true">
-      <div class="cat-tail"></div>
-      <div class="cat-body"></div>
-      <div class="cat-leg one"></div>
-      <div class="cat-leg two"></div>
-      <div class="cat-ear left"></div>
-      <div class="cat-ear right"></div>
-      <div class="cat-head"></div>
-      <div class="cat-face eye-left"></div>
-      <div class="cat-face eye-right"></div>
-      <div class="cat-face mouth"></div>
-      <div class="cat-cheek left"></div>
-      <div class="cat-cheek right"></div>
+    <div class="pet-scene">
+      <div class="pet-sparks" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p class="pet-action-label" id="petActionLabel">Nice</p>
+      <div class="pet-bubble" id="petBubble">好耶！</div>
+      <div class="pixel-cat stage" aria-hidden="true">
+        <div class="cat-tail"></div>
+        <div class="cat-body"></div>
+        <div class="cat-leg one"></div>
+        <div class="cat-leg two"></div>
+        <div class="cat-ear left"></div>
+        <div class="cat-ear right"></div>
+        <div class="cat-head"></div>
+        <div class="cat-paw"></div>
+        <div class="cat-face eye-left"></div>
+        <div class="cat-face eye-right"></div>
+        <div class="cat-face mouth"></div>
+        <div class="cat-cheek left"></div>
+        <div class="cat-cheek right"></div>
+      </div>
     </div>
   </div>
 
@@ -1031,6 +1397,70 @@
       progress: "cet6-trainer-progress"
     };
 
+    const catLines = {
+      idle: [
+        "先热身一题，节奏交给你。",
+        "慢慢来，读懂比刷快更重要。",
+        "今天不用完美，坐下开始就很厉害。",
+        "看到长文章别急，先抓主题句。",
+        "猫猫值班中，专门负责给你补能量。",
+        "选词填空先看词性，别被第一眼带跑。",
+        "做累了就呼吸一下，回来还能继续。"
+      ],
+      cloze: [
+        "这类题先分词性，再看前后搭配。",
+        "空格附近的动词、介词和逻辑词很关键。",
+        "别急着选，先把词库按名词动词形容词分一遍。",
+        "遇到犹豫项，回到上下文找语气和逻辑。"
+      ],
+      reading: [
+        "阅读先定位，不要和全文硬刚。",
+        "题干关键词圈住，答案通常藏在同义改写里。",
+        "选项太绝对时留个心眼。",
+        "先看问题再读文章，猫猫给你守住节奏。"
+      ],
+      translation: [
+        "翻译先保信息完整，再把句子磨自然。",
+        "不会的表达先换一种说法，别卡住。",
+        "主谓宾先站稳，修饰语慢慢加上去。",
+        "关键词别漏，句子顺一点就会很好看。"
+      ],
+      good: [
+        "喵！答对啦，六级战斗力 +1！",
+        "漂亮，这题拿下了，继续保持！",
+        "太稳了，今天的手感正在变好。",
+        "这一下很干脆，猫猫给你鼓掌。",
+        "对味了，思路和答案站到一起了。",
+        "好球，这题没有骗到你。",
+        "继续这样来，分数会一点点长出来。",
+        "答得很漂亮，今天的你很在线。",
+        "这题拿下，给自己记一颗小星星。",
+        "猫猫认证：这一步很扎实。"
+      ],
+      bad: [
+        "没关系，错题是升级材料，猫猫陪你补上。",
+        "这题先收进经验值，下一题我们拿回来。",
+        "别慌，知道错在哪就已经赢一半了。",
+        "这次没选中，但方向可以修正。",
+        "错一下不丢人，复盘一下就变成你的分。",
+        "猫猫拍拍，先看解析，再赢回来。",
+        "这题只是提醒你：这里值得多看一眼。",
+        "慢一点也没事，稳住比硬冲更有用。",
+        "现在发现问题，比考试时发现好太多。",
+        "先把坑记住，下次它就没那么厉害了。"
+      ],
+      reviewed: [
+        "这题已经看过解析，下一题会更顺。",
+        "复盘完成，把注意力放回下一步。",
+        "错题本不是惩罚，是你的提分地图。"
+      ],
+      empty: [
+        "这个筛选暂时没有题，换个考点试试。",
+        "猫猫翻了一下题库，这里空空的。",
+        "换个题型，马上继续。"
+      ]
+    };
+
     const allowedSections = new Set(["cloze", "reading", "translation"]);
 
     let bank = loadBank();
@@ -1039,6 +1469,7 @@
     let selectedAnswer = "";
     let checked = false;
     let wrongOnly = false;
+    let catLineMemory = {};
 
     const els = {
       bankName: document.getElementById("bankName"),
@@ -1071,7 +1502,10 @@
       normalMode: document.getElementById("normalMode"),
       toast: document.getElementById("toast"),
       petPop: document.getElementById("petPop"),
-      petBubble: document.getElementById("petBubble")
+      petBubble: document.getElementById("petBubble"),
+      petActionLabel: document.getElementById("petActionLabel"),
+      coachBubble: document.getElementById("coachBubble"),
+      coachText: document.getElementById("coachText")
     };
 
     function loadBank() {
@@ -1232,6 +1666,7 @@
         window.setTimeout(() => els.translationInput.focus(), 0);
       }
 
+      updateCoach(question.section);
       updateStats();
     }
 
@@ -1248,6 +1683,7 @@
       els.feedbackBox.className = "feedback";
       els.feedbackBox.innerHTML = "";
       els.statusText.textContent = "换一个筛选条件试试";
+      updateCoach("empty");
       updateStats();
     }
 
@@ -1464,14 +1900,34 @@
       showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 1800);
     }
 
+    function pickCatLine(mode) {
+      const pool = catLines[mode] || catLines.idle;
+      if (pool.length === 1) return pool[0];
+      const last = catLineMemory[mode];
+      const candidates = pool.filter((line) => line !== last);
+      const next = candidates[Math.floor(Math.random() * candidates.length)];
+      catLineMemory[mode] = next;
+      return next;
+    }
+
+    function updateCoach(mode, forcedLine) {
+      if (!els.coachText || !els.coachBubble) return;
+      els.coachText.textContent = forcedLine || pickCatLine(mode);
+      els.coachBubble.classList.remove("bump");
+      void els.coachBubble.offsetWidth;
+      els.coachBubble.classList.add("bump");
+    }
+
     function showPet(mode) {
-      const messages = {
-        good: ["喵！答对啦，六级战斗力 +1！", "漂亮，这题拿下了，继续保持！", "太稳了，今天的手感正在变好。"],
-        bad: ["没关系，错题是升级材料，猫猫陪你补上。", "这题先收进经验值，下一题我们拿回来。", "别慌，知道错在哪就已经赢一半了。"],
-        translation: ["译完啦，对照参考译文，把句子再磨顺一点。", "汉翻英完成，看看关键词有没有落下。", "很好，翻译就是一次次改到更自然。"]
+      const labelMap = {
+        good: "Correct",
+        bad: "Keep Going",
+        translation: "Translation"
       };
-      const pool = messages[mode] || messages.good;
-      els.petBubble.textContent = pool[Math.floor(Math.random() * pool.length)];
+      const message = pickCatLine(mode);
+      els.petActionLabel.textContent = labelMap[mode] || "Nice";
+      els.petBubble.textContent = message;
+      updateCoach(mode, message);
       els.petPop.classList.remove("show", "good", "bad", "translation");
       void els.petPop.offsetWidth;
       els.petPop.classList.add("show", mode);
@@ -1515,6 +1971,10 @@
 
     renderWrongList();
     pickQuestion();
+    window.setInterval(() => {
+      if (!currentQuestion || checked) return;
+      updateCoach(currentQuestion.section || "idle");
+    }, 9000);
   </script>
 </body>
 </html>
